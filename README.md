@@ -1,5 +1,5 @@
 # Fossil-Fighters-Spawn-Editor
-This is a simple graphical editor for FF1 (and eventually FFC) dig site fossil spawns.
+This is a simple graphical editor for FF1 and FFC dig site fossil spawns.
 
 To use, just drag and drop a ROM onto spawns.exe. If the folder NDS_UNPACK does not exist, it will make that folder and unpack the ROM
 into it; be patient as it does so. Then, you can use the editor. It should be mostly self-eplanatory, but please
