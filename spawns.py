@@ -88,7 +88,52 @@ if (rom == "ff1"):
                         temp["vivos"].append([val + point4, vivoNum, val + point4 + 4, chance])
                     spawns[mapN][str(index).zfill(2)].append(temp)
 else:
-    pass
+    spawns = {}
+    for root, dirs, files in os.walk("NDS_UNPACK/data/map/m/bin/"):
+        for file in files:
+            mapN = os.path.join(root, file).split("\\")[-2]
+            mapN = mapN.split("/")[-1] # it just works
+            if ((file == "0.bin") and (os.path.exists("NDS_UNPACK/data/map/e/" + mapN) == True)):
+                f = open(os.path.join(root, file), "rb")
+                r = f.read()
+                f.close()
+                point = int.from_bytes(r[0x6C:0x70], "little")
+                realP = [ int.from_bytes(r[point:(point + 4)], "little") ]
+                loc = point + 4
+                while (realP[-1] > 0):
+                    realP.append(int.from_bytes(r[loc:(loc + 4)], "little"))
+                    loc = loc + 4
+                realP = realP[0:-1]
+                for val in realP:
+                    index = int.from_bytes(r[(val + 2):(val + 4)], "little")
+                    if (index == 0):
+                        continue
+                    else:
+                        if (mapN not in spawns.keys()):
+                            spawns[mapN] = {}
+                            spawnList.append(mapN)
+                    if (str(index).zfill(2) not in spawns[mapN].keys()):
+                        spawns[mapN][str(index).zfill(2)] = []
+                    numTables = int.from_bytes(r[(val + 12):(val + 16)], "little")
+                    point3 = int.from_bytes(r[(val + 16):(val + 20)], "little")
+                    for i in range(numTables):
+                        temp = {}
+                        point4 = int.from_bytes(r[(val + point3 + (i * 4)):(val + point3 + (i * 4) + 4)], "little")
+                        point5 = int.from_bytes(r[(val + point4 + 12):(val + point4 + 16)], "little")
+                        maxFos = int.from_bytes(r[(val + point4 + point5 + 4):(val + point4 + point5 + 8)], "little")
+                        temp["maxFos"] = [val + point4 + point5 + 4, maxFos]
+                        numWeird = int.from_bytes(r[(val + point4 + point5 + 8):(val + point4 + point5 + 12)], "little")
+                        numSpawns = int.from_bytes(r[(val + point4 + point5 + 16):(val + point4 + point5 + 20)], "little")
+                        temp["numSpawns"] = numSpawns
+                        temp["fossils"] = []
+                        startSpawns = val + point4 + point5 + 24 + (numWeird * 2)
+                        for j in range(numSpawns):
+                            thisStart = startSpawns + (j * 8)
+                            dark = r[thisStart]
+                            rare = r[thisStart + 1]
+                            kasNum = int.from_bytes(r[(thisStart + 2):(thisStart + 4)], "little")
+                            temp["fossils"].append([thisStart, dark, thisStart + 1, rare, thisStart + 2, kasNum])
+                        spawns[mapN][str(index).zfill(2)].append(temp)
 
 curr = spawnList[0]
 currZ = list(spawns[curr].keys())[0]
@@ -108,6 +153,7 @@ def makeLayout():
         [ psg.Text("Max Fossils:", size = 10), psg.Input(default_text = spawns[curr][currZ][int(currF)]["maxFos"][1],
             key = "maxFos", size = 5, enable_events = True) ]            
     ]
+    col = []
     for i in range(spawns[curr][currZ][int(currF)]["numSpawns"]):
         # print(i)
         if (rom == "ff1"):
@@ -120,8 +166,19 @@ def makeLayout():
                     enable_events = True)
             ]
         else:
-            pass
-        layout = layout + [row]
+            row = [ # yes, I know this is formatted as a column ulol
+                psg.Text("Dark:"),
+                psg.DropDown(["N/A", "No", "Yes"], key = "dark" + str(i),
+                    default_value = (["N/A", "No", "Yes"])[spawns[curr][currZ][int(currF)]["fossils"][i][1]]),
+                psg.Text("Rare:"),
+                psg.DropDown(["N/A", "No", "Yes"], key = "rare" + str(i),
+                    default_value = (["N/A", "No", "Yes"])[spawns[curr][currZ][int(currF)]["fossils"][i][3]]),
+                 psg.Text("Fossil:"),
+                psg.DropDown(kNamesAlph, key = "fossil" + str(i),
+                    default_value = kNames[spawns[curr][currZ][int(currF)]["fossils"][i][5]])
+            ]
+        col.append(row)
+    layout = layout + [[psg.Column(col, scrollable = True, vertical_scroll_only = True)]]
     layout = layout + [[ psg.Button("Save File", key = "save"), psg.Button("Recompress All", key = "recomp"),
         psg.Button("Rebuild ROM", key = "rebuild") ]]
     return(layout)
@@ -145,6 +202,19 @@ def applyValues(values):
             spawns[curr][currZ][int(currF)]["vivos"][i][3] = max(0, min(int(values["chance" + str(i)]), 100))
         except:
             pass
+            
+        try:
+            spawns[curr][currZ][int(currF)]["fossils"][i][1] = (["N/A", "No", "Yes"]).index(values["dark" + str(i)])
+        except:
+            pass
+        try:
+            spawns[curr][currZ][int(currF)]["fossils"][i][3] = (["N/A", "No", "Yes"]).index(values["rare" + str(i)])
+        except:
+            pass
+        try:
+            spawns[curr][currZ][int(currF)]["fossils"][i][5] = kNames.index(values["fossil" + str(i)])
+        except:
+            pass
 
 def saveFile():
     global curr
@@ -152,31 +222,38 @@ def saveFile():
     global currF
     global spawns
 
+    path = "NDS_UNPACK/data/map/m/bin/" + curr[0:4] + "/0.bin"
+    f = open(path, "rb")
+    r = f.read()
+    f.close()
+    f = open(path, "wb")
+    f.close()
+    f = open(path, "ab")
+    
+    tupleList = [ (spawns[curr][currZ][int(currF)]["maxFos"][0], spawns[curr][currZ][int(currF)]["maxFos"][1]) ]
     if (rom == "ff1"):
-        path = "NDS_UNPACK/data/map/m/bin/" + curr[0:4] + "/0.bin"
-        f = open(path, "rb")
-        r = f.read()
-        f.close()
-        f = open(path, "wb")
-        f.close()
-        f = open(path, "ab")
-        
-        tupleList = [ (spawns[curr][currZ][int(currF)]["maxFos"][0], spawns[curr][currZ][int(currF)]["maxFos"][1]) ]
         for i in range(spawns[curr][currZ][int(currF)]["numSpawns"]):
             tupleList.append( (spawns[curr][currZ][int(currF)]["vivos"][i][0], spawns[curr][currZ][int(currF)]["vivos"][i][1]) )
             tupleList.append( (spawns[curr][currZ][int(currF)]["vivos"][i][2], spawns[curr][currZ][int(currF)]["vivos"][i][3]) )
-        tupleList.sort()
-        f.write(r[0:tupleList[0][0]])
-        for i in range(len(tupleList) - 1):
-            f.write(tupleList[i][1].to_bytes(4, "little"))
-            f.write(r[(tupleList[i][0] + 4):tupleList[i + 1][0]])
-        f.write(tupleList[-1][1].to_bytes(4, "little"))
-        f.write(r[(tupleList[-1][0] + 4):])
-        f.close()
-        subprocess.run([ "fftool.exe", "compress", "NDS_UNPACK/data/map/m/bin/" + curr[0:4], "-c", "None", "-c", "None",
-            "-i", "0.bin", "-o", "NDS_UNPACK/data/map/m/" + curr[0:4] ])
     else:
-        pass
+        for i in range(spawns[curr][currZ][int(currF)]["numSpawns"]):
+            tupleList.append( (spawns[curr][currZ][int(currF)]["fossils"][i][0], spawns[curr][currZ][int(currF)]["fossils"][i][1]) )
+            tupleList.append( (spawns[curr][currZ][int(currF)]["fossils"][i][2], spawns[curr][currZ][int(currF)]["fossils"][i][3]) ) 
+            tupleList.append( (spawns[curr][currZ][int(currF)]["fossils"][i][4], spawns[curr][currZ][int(currF)]["fossils"][i][5]) )                
+    tupleList.sort()
+    f.write(r[0:tupleList[0][0]])
+    for i in range(len(tupleList) - 1):
+        if ((tupleList[i + 1][0] - tupleList[i][0]) == 1):
+            f.write(tupleList[i][1].to_bytes(1, "little"))
+        else:
+            f.write(tupleList[i][1].to_bytes(2, "little"))
+            f.write(r[(tupleList[i][0] + 2):tupleList[i + 1][0]])
+    f.write(tupleList[-1][1].to_bytes(2, "little"))
+    f.write(r[(tupleList[-1][0] + 2):])
+    f.close()
+    subprocess.run([ "fftool.exe", "compress", "NDS_UNPACK/data/map/m/bin/" + curr[0:4], "-c", "None", "-c", "None",
+        "-i", "0.bin", "-o", "NDS_UNPACK/data/map/m/" + curr[0:4] ])
+
     psg.popup("File saved!", font = "-size 12")
 
 res = makeLayout()
