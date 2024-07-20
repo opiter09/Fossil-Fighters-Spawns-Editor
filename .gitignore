@@ -1,0 +1,9 @@
+NDS_UNPACK*
+0037
+*.nds
+*.sav
+*.mch
+out.xdelta
+0023
+teams.bat
+*.pyc
