@@ -6,10 +6,12 @@ into it; be patient as it does so. Then, you can use the editor. It should be mo
 note the following:
 - This editor does not let you Add or Remove spawns, only Change existing ones. This is because the map files are "pointers all
   the way down", and I don't feel like untangling it all
-- The load button loads the selected combination of file, zone, and fossil chip. Reloading, even for the same file, will erase
-  your unsaved edits, so make sure to use Save File first (which saves the entire file, to be clear)
+- The load button loads the selected combination of file and zone. Reloading, even for the same file, will erase your unsaved
+  edits, so make sure to use Save File first (which saves the entire file, to be clear)
 - To get an easier grasp on the files and especially the zones, check out FF1-E-Maps-Color.zip and FFC-E-Maps-Color.zip,
   which are all the digsites. in the game color-coded by zone
+- In order to fit all three chips in horizontally, certain FFC fossil names had to be shortened (only in the tool; the digsite
+  output still uses the full names). The main one to remember is that "Dr." is short for "Dropping"
 - As seems to be a tradition at this point, FF1 only lets you edit vivosaur spawns (so no jewels, droppings, etc.) because I
   can't find the rest
 - Upon rebuilding, the tool will generate a file named ff1_digsiteOutput.txt or ffc_digsiteOutput.txt. This will show all of the

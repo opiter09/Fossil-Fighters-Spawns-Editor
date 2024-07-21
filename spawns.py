@@ -25,7 +25,7 @@ if (rom == "ff1"):
     vNamesAlph.sort()
     vNames = ["NONE"] + vNames
 else:
-    f = open(rom + "_kasekiNames.txt", "rt")
+    f = open(rom + "_kasekiNames_Short.txt", "rt")
     kNames = list(f.read().split("\n"))
     f.close()
     kNamesAlph = [x for x in kNames if x != "Other"]
@@ -137,51 +137,62 @@ else:
 
 curr = spawnList[0]
 currZ = list(spawns[curr].keys())[0]
-currF = "00"
 
 def makeLayout():
     global curr
     global currZ
-    global currF
     global spawns
 
     layout = [
         [ psg.Text("Spawn File:", size = 10), psg.DropDown(spawnList, key = "file", default_value = curr) ],
-        [ psg.Text("Zone:", size = 10), psg.DropDown(list(spawns[curr].keys()), key = "zone", default_value = currZ) ],
-        [ psg.Text("Fossil Chips:", size = 10), psg.DropDown(["00", "01", "02"], key = "chips", default_value = currF),
-            psg.Button("Load", key = "load") ],
-        [ psg.Text("Max Fossils:", size = 10), psg.Input(default_text = spawns[curr][currZ][int(currF)]["maxFos"][1],
-            key = "maxFos", size = 5, enable_events = True) ]            
+        [ psg.Text("Zone:", size = 10), psg.DropDown(list(spawns[curr].keys()), key = "zone", default_value = currZ),
+            psg.Button("Load", key = "load") ]           
     ]
-    col = []
-    for i in range(spawns[curr][currZ][int(currF)]["numSpawns"]):
-        # print(i)
+    cols3 = []
+    cols3_scr = []
+    for currF in range(len(spawns[curr][currZ])):
+        plural = "s"
+        if (currF == 1):
+            plural = ""
+        col = [
+            [psg.Text(str(currF) + " Fossil Chip" + plural + ":")],
+            [ psg.Text("Max Fossils:", size = 10), psg.Input(default_text = spawns[curr][currZ][currF]["maxFos"][1],
+            key = str(currF) + "maxFos", size = 5, enable_events = True) ]   
+        ]
+        colR = []
+        for i in range(spawns[curr][currZ][currF]["numSpawns"]):
+            # print(i)
+            if (rom == "ff1"):
+                row = [ # yes, I know this is formatted as a column ulol
+                    psg.Text("Vivosaur:"),
+                    psg.DropDown(vNamesAlph, key = str(currF) + "vivo" + str(i),
+                        default_value = vNames[spawns[curr][currZ][currF]["vivos"][i][1]]),
+                    psg.Text("% Chance:"),
+                    psg.Input(default_text = spawns[curr][currZ][currF]["vivos"][i][3], key = str(currF) + "chance" + str(i),
+                        size = 5, enable_events = True)
+                ]
+            else:
+                row = [ # yes, I know this is formatted as a column ulol
+                    psg.Text("Dark:"),
+                    psg.DropDown(["N/A", "No", "Yes"], key = str(currF) + "dark" + str(i),
+                        default_value = (["N/A", "No", "Yes"])[spawns[curr][currZ][currF]["fossils"][i][1]]),
+                    psg.Text("Rare:"),
+                    psg.DropDown(["N/A", "No", "Yes"], key = str(currF) + "rare" + str(i),
+                        default_value = (["N/A", "No", "Yes"])[spawns[curr][currZ][currF]["fossils"][i][3]]),
+                     psg.Text("Fossil:"),
+                    psg.DropDown(kNamesAlph, key = str(currF) + "fossil" + str(i),
+                        default_value = kNames[spawns[curr][currZ][currF]["fossils"][i][5]])
+                ]
+            colR.append(row)
         if (rom == "ff1"):
-            row = [ # yes, I know this is formatted as a column ulol
-                psg.Text("Vivosaur:"),
-                psg.DropDown(vNamesAlph, key = "vivo" + str(i),
-                    default_value = vNames[spawns[curr][currZ][int(currF)]["vivos"][i][1]]),
-                psg.Text("% Chance:"),
-                psg.Input(default_text = spawns[curr][currZ][int(currF)]["vivos"][i][3], key = "chance" + str(i), size = 5,
-                    enable_events = True)
-            ]
+            cols3.append(psg.Column(col + colR))
+            cols3.append(psg.Column([[psg.Text("", size = 0)]]))
         else:
-            row = [ # yes, I know this is formatted as a column ulol
-                psg.Text("Dark:"),
-                psg.DropDown(["N/A", "No", "Yes"], key = "dark" + str(i),
-                    default_value = (["N/A", "No", "Yes"])[spawns[curr][currZ][int(currF)]["fossils"][i][1]]),
-                psg.Text("Rare:"),
-                psg.DropDown(["N/A", "No", "Yes"], key = "rare" + str(i),
-                    default_value = (["N/A", "No", "Yes"])[spawns[curr][currZ][int(currF)]["fossils"][i][3]]),
-                 psg.Text("Fossil:"),
-                psg.DropDown(kNamesAlph, key = "fossil" + str(i),
-                    default_value = kNames[spawns[curr][currZ][int(currF)]["fossils"][i][5]])
-            ]
-        col.append(row)
-    if (rom == "ff1"):
-        layout = layout + col
-    else:
-        layout = layout + [[psg.Column(col, scrollable = True, vertical_scroll_only = True)]]
+            col[0] = col[0] + [psg.Text("", size = 35)]
+            col[1] = col[1] + [psg.Text("", size = 35)]
+            cols3.append(psg.Column(col))
+            cols3_scr.append(psg.Column(colR, scrollable = True, vertical_scroll_only = True))
+    layout = layout + [psg.vtop(cols3)] + [psg.vtop(cols3_scr)]
     layout = layout + [[ psg.Button("Save File", key = "save"), psg.Button("Recompress All", key = "recomp"),
         psg.Button("Rebuild ROM", key = "rebuild") ]]
     return(layout)
@@ -189,40 +200,39 @@ def makeLayout():
 def applyValues(values):
     global curr
     global currZ
-    global currF
     global spawns
 
-    try: # these all need exceptions either to handle non-integers or the buttons not existing for one ROM or the other
-        spawns[curr][currZ][int(currF)]["maxFos"][1] = max(0, min(int(values["maxFos"]), 65535))
-    except:
-        pass    
-    for i in range(spawns[curr][currZ][int(currF)]["numSpawns"]):
-        try:
-            spawns[curr][currZ][int(currF)]["vivos"][i][1] = vNames.index(values["vivo" + str(i)])
+    for currF in range(len(spawns[curr][currZ])):
+        try: # these all need exceptions either to handle non-integers or the buttons not existing for one ROM or the other
+            spawns[curr][currZ][currF]["maxFos"][1] = max(0, min(int(values[str(currF) + "maxFos"]), 65535))
         except:
-            pass
-        try:
-            spawns[curr][currZ][int(currF)]["vivos"][i][3] = max(0, min(int(values["chance" + str(i)]), 100))
-        except:
-            pass
-            
-        try:
-            spawns[curr][currZ][int(currF)]["fossils"][i][1] = (["N/A", "No", "Yes"]).index(values["dark" + str(i)])
-        except:
-            pass
-        try:
-            spawns[curr][currZ][int(currF)]["fossils"][i][3] = (["N/A", "No", "Yes"]).index(values["rare" + str(i)])
-        except:
-            pass
-        try:
-            spawns[curr][currZ][int(currF)]["fossils"][i][5] = kNames.index(values["fossil" + str(i)])
-        except:
-            pass
+            pass    
+        for i in range(spawns[curr][currZ][currF]["numSpawns"]):
+            try:
+                spawns[curr][currZ][currF]["vivos"][i][1] = vNames.index(values[str(currF) + "vivo" + str(i)])
+            except:
+                pass
+            try:
+                spawns[curr][currZ][currF]["vivos"][i][3] = max(0, min(int(values[str(currF) + "chance" + str(i)]), 100))
+            except:
+                pass
+                
+            try:
+                spawns[curr][currZ][currF]["fossils"][i][1] = (["N/A", "No", "Yes"]).index(values[str(currF) + "dark" + str(i)])
+            except:
+                pass
+            try:
+                spawns[curr][currZ][currF]["fossils"][i][3] = (["N/A", "No", "Yes"]).index(values[str(currF) + "rare" + str(i)])
+            except:
+                pass
+            try:
+                spawns[curr][currZ][currF]["fossils"][i][5] = kNames.index(values[str(currF) + "fossil" + str(i)])
+            except:
+                pass
 
 def saveFile():
     global curr
     global currZ
-    global currF
     global spawns
 
     path = "NDS_UNPACK/data/map/m/bin/" + curr[0:4] + "/0.bin"
@@ -233,16 +243,18 @@ def saveFile():
     f.close()
     f = open(path, "ab")
     
-    tupleList = [ (spawns[curr][currZ][int(currF)]["maxFos"][0], spawns[curr][currZ][int(currF)]["maxFos"][1]) ]
-    if (rom == "ff1"):
-        for i in range(spawns[curr][currZ][int(currF)]["numSpawns"]):
-            tupleList.append( (spawns[curr][currZ][int(currF)]["vivos"][i][0], spawns[curr][currZ][int(currF)]["vivos"][i][1]) )
-            tupleList.append( (spawns[curr][currZ][int(currF)]["vivos"][i][2], spawns[curr][currZ][int(currF)]["vivos"][i][3]) )
-    else:
-        for i in range(spawns[curr][currZ][int(currF)]["numSpawns"]):
-            tupleList.append( (spawns[curr][currZ][int(currF)]["fossils"][i][0], spawns[curr][currZ][int(currF)]["fossils"][i][1]) )
-            tupleList.append( (spawns[curr][currZ][int(currF)]["fossils"][i][2], spawns[curr][currZ][int(currF)]["fossils"][i][3]) ) 
-            tupleList.append( (spawns[curr][currZ][int(currF)]["fossils"][i][4], spawns[curr][currZ][int(currF)]["fossils"][i][5]) )                
+    tupleList = []
+    for currF in range(len(spawns[curr][currZ])):
+        tupleList.append( (spawns[curr][currZ][currF]["maxFos"][0], spawns[curr][currZ][currF]["maxFos"][1]) )
+        if (rom == "ff1"):
+            for i in range(spawns[curr][currZ][currF]["numSpawns"]):
+                tupleList.append( (spawns[curr][currZ][currF]["vivos"][i][0], spawns[curr][currZ][currF]["vivos"][i][1]) )
+                tupleList.append( (spawns[curr][currZ][currF]["vivos"][i][2], spawns[curr][currZ][currF]["vivos"][i][3]) )
+        else:
+            for i in range(spawns[curr][currZ][currF]["numSpawns"]):
+                tupleList.append( (spawns[curr][currZ][currF]["fossils"][i][0], spawns[curr][currZ][currF]["fossils"][i][1]) )
+                tupleList.append( (spawns[curr][currZ][currF]["fossils"][i][2], spawns[curr][currZ][currF]["fossils"][i][3]) ) 
+                tupleList.append( (spawns[curr][currZ][currF]["fossils"][i][4], spawns[curr][currZ][currF]["fossils"][i][5]) )                
     tupleList.sort()
     f.write(r[0:tupleList[0][0]])
     for i in range(len(tupleList) - 1):
@@ -270,7 +282,6 @@ while True:
     elif (event == "load"):
         curr = values["file"]
         currZ = values["zone"]
-        currF = values["chips"]
         window.close()
         res = makeLayout()
         window = psg.Window("", res, grab_anywhere = True, resizable = True, font = "-size 12")
