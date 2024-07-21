@@ -178,7 +178,10 @@ def makeLayout():
                     default_value = kNames[spawns[curr][currZ][int(currF)]["fossils"][i][5]])
             ]
         col.append(row)
-    layout = layout + [[psg.Column(col, scrollable = True, vertical_scroll_only = True)]]
+    if (rom == "ff1"):
+        layout = layout + col
+    else:
+        layout = layout + [[psg.Column(col, scrollable = True, vertical_scroll_only = True)]]
     layout = layout + [[ psg.Button("Save File", key = "save"), psg.Button("Recompress All", key = "recomp"),
         psg.Button("Rebuild ROM", key = "rebuild") ]]
     return(layout)
