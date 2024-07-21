@@ -12,6 +12,8 @@ note the following:
   which are all the digsites. in the game color-coded by zone
 - As seems to be a tradition at this point, FF1 only lets you edit vivosaur spawns (so no jewels, droppings, etc.) because I
   can't find the rest
+- Upon rebuilding, the tool will generate a file named ff1_digsiteOutput.txt or ffc_digsiteOutput.txt. This will show all of the
+  spawn locations of the new ROM (to make distributing hacks and whatnot easier).
 - The Recompress All button is for debugging purposes ONLY. It is extremely slow, and should not be necessary unless you are trying
   to help me figure out a problem
   
