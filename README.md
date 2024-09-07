@@ -3,8 +3,8 @@ This is a simple graphical editor for FF1 and FFC dig site fossil spawns.
 
 You MUST put the ROM in the same folder as the exe, or it won't work.
 
-To use, just drag and drop a ROM onto spawns.exe. If the folder NDS_UNPACK does not exist, it will make that folder and unpack the ROM
-into it; be patient as it does so. Then, you can use the editor. It should be mostly self-eplanatory, but please
+To use, just drag and drop a ROM onto spawns.exe. If the folder NDS_UNPACK does not exist, it will make that folder and unpack the
+ROM into it; be patient as it does so. Then, you can use the editor. It should be mostly self-eplanatory, but please
 note the following:
 - This editor does not let you Add or Remove spawns, only Change existing ones. This is because the map files are "pointers all
   the way down", and I don't feel like untangling it all
@@ -16,8 +16,8 @@ note the following:
   output still uses the full names). The main one to remember is that "Dr." is short for "Dropping"
 - As seems to be a tradition at this point, FF1 only lets you edit vivosaur spawns (so no jewels, droppings, etc.) because I
   can't find the rest
-- Upon rebuilding, the tool will generate a file named ff1_digsiteOutput.txt or ffc_digsiteOutput.txt. This will show all of the
-  spawn locations of the new ROM (to make distributing hacks and whatnot easier).
+- Upon rebuilding, the tool will generate a file named ff1_digsiteOutputNew.txt or ffc_digsiteOutputNew.txt. This will show all of
+  the spawn locations of the new ROM (to make distributing hacks and whatnot easier)
 - The Recompress All button is for debugging purposes ONLY. It is extremely slow, and should not be necessary unless you are trying
   to help me figure out a problem
   
