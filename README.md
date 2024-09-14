@@ -8,6 +8,8 @@ ROM into it; be patient as it does so. Then, you can use the editor. It should b
 note the following:
 - This editor does not let you Add or Remove spawns, only Change existing ones. This is because the map files are "pointers all
   the way down", and I don't feel like untangling it all
+- The editor makes no effort to make sure things add up to 100%. So just make sure not to have it add up to less and crash the game
+  or something
 - The load button loads the selected combination of file and zone. Reloading, even for the same file, will erase your unsaved
   edits, so make sure to use Save File first (which saves the entire file, to be clear)
 - To get an easier grasp on the files and especially the zones, check out FF1-E-Maps-Color.zip and FFC-E-Maps-Color.zip,

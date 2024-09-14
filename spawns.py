@@ -85,8 +85,18 @@ if (rom == "ff1"):
                         point4 = int.from_bytes(r[(val + point3 + (i * 4)):(val + point3 + (i * 4) + 4)], "little")
                         vivoNum = int.from_bytes(r[(val + point4):(val + point4 + 4)], "little")
                         chance = int.from_bytes(r[(val + point4 + 4):(val + point4 + 8)], "little")
-                        temp["vivos"].append([val + point4, vivoNum, val + point4 + 4, chance])
-                    spawns[mapN][str(index).zfill(2)].append(temp)
+                        parts = [
+                            val + point4 + 16,
+                            int.from_bytes(r[(val + point4 + 16):(val + point4 + 20)], "little"),
+                            val + point4 + 20,
+                            int.from_bytes(r[(val + point4 + 20):(val + point4 + 24)], "little"),
+                            val + point4 + 24,
+                            int.from_bytes(r[(val + point4 + 24):(val + point4 + 28)], "little"),
+                            val + point4 + 28,
+                            int.from_bytes(r[(val + point4 + 28):(val + point4 + 32)], "little")
+                        ]
+                        temp["vivos"].append([val + point4, vivoNum, val + point4 + 4, chance] + parts)
+                    spawns[mapN][str(index).zfill(2)].append(temp)                    
 else:
     spawns = {}
     for root, dirs, files in os.walk("NDS_UNPACK/data/map/m/bin/"):
@@ -135,6 +145,15 @@ else:
                             temp["fossils"].append([thisStart, dark, thisStart + 1, rare, thisStart + 2, kasNum])
                         spawns[mapN][str(index).zfill(2)].append(temp)
 
+maps = list(spawns.keys()).copy()
+for m in maps:
+    ind = list(spawns[m].keys()).copy()
+    for i in ind:
+        if (len(spawns[m][i]) < 3):
+            spawns.pop(m)
+            spawnList.remove(m)
+            break
+
 curr = spawnList[0]
 currZ = list(spawns[curr].keys())[0]
 
@@ -171,6 +190,19 @@ def makeLayout():
                     psg.Input(default_text = spawns[curr][currZ][currF]["vivos"][i][3], key = str(currF) + "chance" + str(i),
                         size = 5, enable_events = True)
                 ]
+                row2 = [
+                    psg.Text("    Parts %:"),
+                    psg.Input(default_text = spawns[curr][currZ][currF]["vivos"][i][5], key = str(currF) + "part1" + str(i),
+                        size = 5, enable_events = True),
+                    psg.Input(default_text = spawns[curr][currZ][currF]["vivos"][i][7], key = str(currF) + "part2" + str(i),
+                        size = 5, enable_events = True),
+                    psg.Input(default_text = spawns[curr][currZ][currF]["vivos"][i][9], key = str(currF) + "part3" + str(i),
+                        size = 5, enable_events = True),
+                    psg.Input(default_text = spawns[curr][currZ][currF]["vivos"][i][11], key = str(currF) + "part4" + str(i),
+                        size = 5, enable_events = True)
+                ]
+                colR.append(row)
+                colR.append(row2)                   
             else:
                 row = [ # yes, I know this is formatted as a column ulol
                     psg.Text("Dark:"),
@@ -183,7 +215,7 @@ def makeLayout():
                     psg.DropDown(kNamesAlph, key = str(currF) + "fossil" + str(i),
                         default_value = kNames[spawns[curr][currZ][currF]["fossils"][i][5]])
                 ]
-            colR.append(row)
+                colR.append(row)
         if (rom == "ff1"):
             cols3.append(psg.Column(col + colR))
             cols3.append(psg.Column([[psg.Text("", size = 0)]]))
@@ -212,8 +244,25 @@ def applyValues(values):
                 spawns[curr][currZ][currF]["vivos"][i][1] = vNames.index(values[str(currF) + "vivo" + str(i)])
             except:
                 pass
+
             try:
                 spawns[curr][currZ][currF]["vivos"][i][3] = max(0, min(int(values[str(currF) + "chance" + str(i)]), 100))
+            except:
+                pass
+            try:
+                spawns[curr][currZ][currF]["vivos"][i][5] = max(0, min(int(values[str(currF) + "part1" + str(i)]), 100))
+            except:
+                pass
+            try:
+                spawns[curr][currZ][currF]["vivos"][i][7] = max(0, min(int(values[str(currF) + "part2" + str(i)]), 100))
+            except:
+                pass
+            try:
+                spawns[curr][currZ][currF]["vivos"][i][9] = max(0, min(int(values[str(currF) + "part3" + str(i)]), 100))
+            except:
+                pass
+            try:
+                spawns[curr][currZ][currF]["vivos"][i][11] = max(0, min(int(values[str(currF) + "part4" + str(i)]), 100))
             except:
                 pass
                 
@@ -250,6 +299,10 @@ def saveFile():
             for i in range(spawns[curr][currZ][currF]["numSpawns"]):
                 tupleList.append( (spawns[curr][currZ][currF]["vivos"][i][0], spawns[curr][currZ][currF]["vivos"][i][1]) )
                 tupleList.append( (spawns[curr][currZ][currF]["vivos"][i][2], spawns[curr][currZ][currF]["vivos"][i][3]) )
+                tupleList.append( (spawns[curr][currZ][currF]["vivos"][i][4], spawns[curr][currZ][currF]["vivos"][i][5]) )
+                tupleList.append( (spawns[curr][currZ][currF]["vivos"][i][6], spawns[curr][currZ][currF]["vivos"][i][7]) )
+                tupleList.append( (spawns[curr][currZ][currF]["vivos"][i][8], spawns[curr][currZ][currF]["vivos"][i][9]) )
+                tupleList.append( (spawns[curr][currZ][currF]["vivos"][i][10], spawns[curr][currZ][currF]["vivos"][i][11]) )
         else:
             for i in range(spawns[curr][currZ][currF]["numSpawns"]):
                 tupleList.append( (spawns[curr][currZ][currF]["fossils"][i][0], spawns[curr][currZ][currF]["fossils"][i][1]) )
