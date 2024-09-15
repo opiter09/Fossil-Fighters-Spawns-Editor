@@ -191,7 +191,8 @@ def makeLayout():
                         size = 5, enable_events = True)
                 ]
                 row2 = [
-                    psg.Text("    Parts %:"),
+                    psg.Push(),
+                    psg.Text("Parts %:"),
                     psg.Input(default_text = spawns[curr][currZ][currF]["vivos"][i][5], key = str(currF) + "part1" + str(i),
                         size = 5, enable_events = True),
                     psg.Input(default_text = spawns[curr][currZ][currF]["vivos"][i][7], key = str(currF) + "part2" + str(i),
@@ -199,7 +200,8 @@ def makeLayout():
                     psg.Input(default_text = spawns[curr][currZ][currF]["vivos"][i][9], key = str(currF) + "part3" + str(i),
                         size = 5, enable_events = True),
                     psg.Input(default_text = spawns[curr][currZ][currF]["vivos"][i][11], key = str(currF) + "part4" + str(i),
-                        size = 5, enable_events = True)
+                        size = 5, enable_events = True),
+                    psg.Push()
                 ]
                 colR.append(row)
                 colR.append(row2)                   
