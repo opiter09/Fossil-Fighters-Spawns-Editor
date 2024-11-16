@@ -16,6 +16,13 @@ else:
 if (os.path.exists("NDS_UNPACK") == False):
     subprocess.run([ "dslazy.bat", "UNPACK", sys.argv[1] ])
     subprocess.run([ "fftool.exe", "NDS_UNPACK/data/map/m" ])
+    
+if (rom == "ffc"):
+    subprocess.run([ "xdelta3-3.0.11-x86_64.exe", "-d", "-f", "-s", "NDS_UNPACK/arm9.bin", "ffc_apFix.xdelta",
+        "NDS_UNPACK/arm9x.bin" ])
+    if (os.path.exists("NDS_UNPACK/arm9x.bin") == True):
+        os.remove("NDS_UNPACK/arm9.bin")
+        os.rename("NDS_UNPACK/arm9x.bin", "NDS_UNPACK/arm9.bin") 
 
 if (rom == "ff1"):
     f = open(rom + "_vivoNames.txt", "rt")
