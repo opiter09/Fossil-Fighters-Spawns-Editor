@@ -149,7 +149,10 @@ else:
                             dark = r[thisStart]
                             rare = r[thisStart + 1]
                             kasNum = int.from_bytes(r[(thisStart + 2):(thisStart + 4)], "little")
-                            temp["fossils"].append([thisStart, dark, thisStart + 1, rare, thisStart + 2, kasNum])
+                            spawnChance = int.from_bytes(r[(thisStart + 4):(thisStart + 6)], "little")
+                            battleChance = int.from_bytes(r[(thisStart + 6):(thisStart + 8)], "little")
+                            temp["fossils"].append([thisStart, dark, thisStart + 1, rare, thisStart + 2, kasNum, thisStart + 4, spawnChance,
+                                thisStart + 6, battleChance])
                         spawns[mapN][str(index).zfill(2)].append(temp)
 
 maps = list(spawns.keys()).copy()
@@ -224,7 +227,18 @@ def makeLayout():
                     psg.DropDown(kNamesAlph, key = str(currF) + "fossil" + str(i),
                         default_value = kNames[spawns[curr][currZ][currF]["fossils"][i][5]])
                 ]
+                row2 = [
+                    psg.Push(),
+                    psg.Text("Spawn %:"),
+                    psg.Input(default_text = spawns[curr][currZ][currF]["fossils"][i][7], key = str(currF) + "spawn" + str(i),
+                        size = 5, enable_events = True),
+                    psg.Text("Battle %:"),
+                    psg.Input(default_text = spawns[curr][currZ][currF]["fossils"][i][9], key = str(currF) + "battle" + str(i),
+                        size = 5, enable_events = True),
+                    psg.Push()
+                ]
                 colR.append(row)
+                colR.append(row2)
         if (rom == "ff1"):
             cols3.append(psg.Column(col + colR))
             cols3.append(psg.Column([[psg.Text("", size = 0)]]))
@@ -234,8 +248,8 @@ def makeLayout():
             cols3.append(psg.Column(col))
             cols3_scr.append(psg.Column(colR, scrollable = True, vertical_scroll_only = True))
     layout = layout + [psg.vtop(cols3)] + [psg.vtop(cols3_scr)]
-    layout = layout + [[ psg.Button("Save File", key = "save"), psg.Button("Recompress All", key = "recomp"),
-        psg.Button("Rebuild ROM", key = "rebuild") ]]
+    layout = [[ psg.Button("Save File", key = "save"), psg.Button("Recompress All", key = "recomp"), 
+        psg.Button("Rebuild ROM", key = "rebuild") ]] + layout
     return(layout)
 
 def applyValues(values):
@@ -253,7 +267,6 @@ def applyValues(values):
                 spawns[curr][currZ][currF]["vivos"][i][1] = vNames.index(values[str(currF) + "vivo" + str(i)])
             except:
                 pass
-
             try:
                 spawns[curr][currZ][currF]["vivos"][i][3] = max(0, min(int(values[str(currF) + "chance" + str(i)]), 100))
             except:
@@ -287,6 +300,14 @@ def applyValues(values):
                 spawns[curr][currZ][currF]["fossils"][i][5] = kNames.index(values[str(currF) + "fossil" + str(i)])
             except:
                 pass
+            try:
+                spawns[curr][currZ][currF]["fossils"][i][7] = max(0, min(int(values[str(currF) + "spawn" + str(i)]), 65535))
+            except:
+                pass
+            try:
+                spawns[curr][currZ][currF]["fossils"][i][9] = max(0, min(int(values[str(currF) + "battle" + str(i)]), 65535))
+            except:
+                pass
 
 def saveFile():
     global curr
@@ -316,7 +337,9 @@ def saveFile():
             for i in range(spawns[curr][currZ][currF]["numSpawns"]):
                 tupleList.append( (spawns[curr][currZ][currF]["fossils"][i][0], spawns[curr][currZ][currF]["fossils"][i][1]) )
                 tupleList.append( (spawns[curr][currZ][currF]["fossils"][i][2], spawns[curr][currZ][currF]["fossils"][i][3]) ) 
-                tupleList.append( (spawns[curr][currZ][currF]["fossils"][i][4], spawns[curr][currZ][currF]["fossils"][i][5]) )                
+                tupleList.append( (spawns[curr][currZ][currF]["fossils"][i][4], spawns[curr][currZ][currF]["fossils"][i][5]) )
+                tupleList.append( (spawns[curr][currZ][currF]["fossils"][i][6], spawns[curr][currZ][currF]["fossils"][i][7]) )
+                tupleList.append( (spawns[curr][currZ][currF]["fossils"][i][8], spawns[curr][currZ][currF]["fossils"][i][9]) )   
     tupleList.sort()
     f.write(r[0:tupleList[0][0]])
     for i in range(len(tupleList) - 1):
