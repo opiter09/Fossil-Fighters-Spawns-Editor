@@ -12,6 +12,7 @@ note the following:
   the way down", and I don't feel like untangling it all
 - The editor makes no effort to make sure things add up to 100%. So just make sure not to have it add up to less and crash the game
   or something
+- FFC spawn chances do not total 100. I honestly don't really understand how they work, other than that 0 means that they won't show up
 - The load button loads the selected combination of file and zone. Reloading, even for the same file, will erase your unsaved
   edits, so make sure to use Save File first (which saves the entire file, to be clear)
 - To get an easier grasp on the files and especially the zones, check out FF1-E-Maps-Color.zip and FFC-E-Maps-Color.zip,
