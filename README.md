@@ -15,7 +15,7 @@ note the following:
 - The load button loads the selected combination of file and zone. Reloading, even for the same file, will erase your unsaved
   edits, so make sure to use Save File first (which saves the entire file, to be clear)
 - To get an easier grasp on the files and especially the zones, check out FF1-E-Maps-Color.zip and FFC-E-Maps-Color.zip,
-  which are all the digsites. in the game color-coded by zone
+  which are all the digsites in the game color-coded by zone
 - In order to fit all three chips in horizontally, certain FFC fossil names had to be shortened (only in the tool; the digsite
   output still uses the full names). The main one to remember is that "Dr." is short for "Dropping"
 - As seems to be a tradition at this point, FF1 only lets you edit vivosaur spawns (so no jewels, droppings, etc.) because I
