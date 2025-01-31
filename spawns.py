@@ -408,7 +408,7 @@ while True:
                     subprocess.run([ "fftool.exe", "compress", "NDS_UNPACK/data/map/m/bin/" + spawnN, "-c", "None", "-c",
                         "None", "-i", "0.bin", "-o", "NDS_UNPACK/data/map/m/" + spawnN ])
         psg.popup("Files recompressed! Don't forget to rebuild!", font = "-size 12")
-    elif (event[1:6] == "spawn"):
+    elif ((len(event) >= 6) and (event[1:6] == "spawn")):
         for currF in range(len(spawns[curr][currZ])):
             total = 0
             for i in range(spawns[curr][currZ][currF]["numSpawns"]):
