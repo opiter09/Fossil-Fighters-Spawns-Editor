@@ -180,14 +180,20 @@ def makeLayout():
     cols3 = []
     cols3_scr = []
     for currF in range(len(spawns[curr][currZ])):
+        total = 0
+        for i in range(spawns[curr][currZ][currF]["numSpawns"]):
+            total = total + spawns[curr][currZ][currF]["fossils"][i][7]
+
         plural = "s"
         if (currF == 1):
             plural = ""
         col = [
-            [psg.Text(str(currF) + " Fossil Chip" + plural + ":")],
+            [ psg.Text(str(currF) + " Fossil Chip" + plural + ":") ],
             [ psg.Text("Max Fossils:", size = 10), psg.Input(default_text = spawns[curr][currZ][currF]["maxFos"][1],
-            key = str(currF) + "maxFos", size = 5, enable_events = True) ]   
+            key = str(currF) + "maxFos", size = 5, enable_events = True) ],          
         ]
+        if (rom == "ffc"):
+            col = col + [[ psg.Text("Spawn Chance Total:", size = 16), psg.Text(str(total), key = str(currF) + "_SCT") ]]
         colR = []
         for i in range(spawns[curr][currZ][currF]["numSpawns"]):
             # print(i)
@@ -229,7 +235,7 @@ def makeLayout():
                 ]
                 row2 = [
                     psg.Push(),
-                    psg.Text("Spawn %:"),
+                    psg.Text("Spawn Chance:"),
                     psg.Input(default_text = spawns[curr][currZ][currF]["fossils"][i][7], key = str(currF) + "spawn" + str(i),
                         size = 5, enable_events = True),
                     psg.Text("Battle %:"),
@@ -245,6 +251,7 @@ def makeLayout():
         else:
             col[0] = col[0] + [psg.Text("", size = 35)]
             col[1] = col[1] + [psg.Text("", size = 35)]
+            col[2] = col[2] + [psg.Text("", size = 35)]
             cols3.append(psg.Column(col))
             cols3_scr.append(psg.Column(colR, scrollable = True, vertical_scroll_only = True))
     layout = layout + [psg.vtop(cols3)] + [psg.vtop(cols3_scr)]
@@ -401,3 +408,12 @@ while True:
                     subprocess.run([ "fftool.exe", "compress", "NDS_UNPACK/data/map/m/bin/" + spawnN, "-c", "None", "-c",
                         "None", "-i", "0.bin", "-o", "NDS_UNPACK/data/map/m/" + spawnN ])
         psg.popup("Files recompressed! Don't forget to rebuild!", font = "-size 12")
+    elif (event[1:6] == "spawn"):
+        for currF in range(len(spawns[curr][currZ])):
+            total = 0
+            for i in range(spawns[curr][currZ][currF]["numSpawns"]):
+                try:
+                    total = total + max(0, min(int(values[str(currF) + "spawn" + str(i)]), 65535))
+                except:
+                    pass
+            window[str(currF) + "_SCT"].update(str(total))
