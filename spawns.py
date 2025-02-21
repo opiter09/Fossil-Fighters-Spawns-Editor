@@ -32,7 +32,7 @@ if (rom == "ff1"):
     vNamesAlph.sort()
     vNames = ["NONE"] + vNames
 else:
-    f = open(rom + "_kasekiNames_Short.txt", "rt")
+    f = open(rom + "_kasekiNamesShort.txt", "rt")
     kNames = list(f.read().split("\n"))
     f.close()
     kNamesAlph = [x for x in kNames if x != "Other"]
