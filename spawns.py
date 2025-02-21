@@ -55,7 +55,7 @@ if (rom == "ff1"):
                 f.close()
                 point = int.from_bytes(r[0x54:0x58], "little")
                 mapName = ""
-                mf = open("Map IDs.txt", "rt")
+                mf = open("ff1_mapNames.txt", "rt")
                 lines = list(mf.read().split("\n")).copy()
                 mf.close()
                 for t in lines:
@@ -115,6 +115,16 @@ else:
                 r = f.read()
                 f.close()
                 point = int.from_bytes(r[0x6C:0x70], "little")
+                mapName = ""
+                mf = open("ffc_mapNames.txt", "rt")
+                mf.close()
+                for t in lines:
+                    if (t != ""):
+                        nums = list(t.split(":")[0].replace(", ", ",").split(",")).copy()
+                        for n in nums:
+                            if (int(mapN) == int(n)):
+                                mapName = t.split(": ")[1]
+                mapN = mapN + " [" + mapName + "]"
                 realP = [ int.from_bytes(r[point:(point + 4)], "little") ]
                 loc = point + 4
                 while (realP[-1] > 0):
