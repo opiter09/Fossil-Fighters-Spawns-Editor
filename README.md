@@ -1,4 +1,4 @@
-# Fossil-Fighters-Spawn-Editor
+# Fossil-Fighters-Spawns-Editor
 This is a simple graphical editor for FF1 and FFC dig site fossil spawns.
 
 You MUST put the ROM in the same folder as the exe, or it won't work. Furthermore, this is only designed for Windows. For Mac and
