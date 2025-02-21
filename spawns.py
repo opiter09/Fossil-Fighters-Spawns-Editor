@@ -117,6 +117,7 @@ else:
                 point = int.from_bytes(r[0x6C:0x70], "little")
                 mapName = ""
                 mf = open("ffc_mapNames.txt", "rt")
+                lines = list(mf.read().split("\n")).copy()
                 mf.close()
                 for t in lines:
                     if (t != ""):
