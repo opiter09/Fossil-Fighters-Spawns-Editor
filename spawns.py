@@ -192,8 +192,9 @@ def makeLayout():
     cols3_scr = []
     for currF in range(len(spawns[curr][currZ])):
         total = 0
-        for i in range(spawns[curr][currZ][currF]["numSpawns"]):
-            total = total + spawns[curr][currZ][currF]["fossils"][i][7]
+        if (rom == "ffc"):
+            for i in range(spawns[curr][currZ][currF]["numSpawns"]):
+                total = total + spawns[curr][currZ][currF]["fossils"][i][7]
 
         plural = "s"
         if (currF == 1):
@@ -372,7 +373,7 @@ def saveFile():
     subprocess.run([ "fftool.exe", "compress", "NDS_UNPACK/data/map/m/bin/" + curr[0:4], "-c", "None", "-c", "None",
         "-i", "0.bin", "-o", "NDS_UNPACK/data/map/m/" + curr[0:4] ])
 
-    psg.popup("File saved!", font = "-size 12")
+    psg.popup("File saved!", title = "", font = "-size 12")
 
 res = makeLayout()
 window = psg.Window("", res, grab_anywhere = True, resizable = True, font = "-size 12")
@@ -404,7 +405,7 @@ while True:
         subprocess.run([ "dslazy.bat", "PACK", "out.nds" ])
         shutil.move("bin/", "NDS_UNPACK/data/map/m/bin/")
         subprocess.run([ "xdelta3-3.0.11-x86_64.exe", "-e", "-f", "-s", sys.argv[1], "out.nds", "out.xdelta" ])
-        psg.popup("You can now play out.nds!", font = "-size 12")
+        psg.popup("You can now play out.nds!", title = "", font = "-size 12")
         break
     elif (event == "recomp"):
         applyValues(values)
@@ -418,7 +419,7 @@ while True:
                     spawnN = os.path.join(root, file).split("\\")[-2]
                     subprocess.run([ "fftool.exe", "compress", "NDS_UNPACK/data/map/m/bin/" + spawnN, "-c", "None", "-c",
                         "None", "-i", "0.bin", "-o", "NDS_UNPACK/data/map/m/" + spawnN ])
-        psg.popup("Files recompressed! Don't forget to rebuild!", font = "-size 12")
+        psg.popup("Files recompressed! Don't forget to rebuild!", title = "", font = "-size 12")
     elif ((len(event) >= 6) and (event[1:6] == "spawn")):
         for currF in range(len(spawns[curr][currZ])):
             total = 0
