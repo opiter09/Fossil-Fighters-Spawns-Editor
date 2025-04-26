@@ -53,6 +53,7 @@ if (rom == "ff1"):
                 f = open(os.path.join(root, file), "rb")
                 r = f.read()
                 f.close()
+                numTables = int.from_bytes(r[0x50:0x54], "little")
                 point = int.from_bytes(r[0x54:0x58], "little")
                 mapName = ""
                 mf = open("ff1_mapNames.txt", "rt")
@@ -65,12 +66,11 @@ if (rom == "ff1"):
                             if (int(mapN) == int(n)):
                                 mapName = t.split(": ")[1]
                 mapN = mapN + " [" + mapName + "]"
-                realP = [ int.from_bytes(r[point:(point + 4)], "little") ]
-                loc = point + 4
-                while (realP[-1] > 0):
+                realP = []
+                loc = point
+                for i in range(numTables):
                     realP.append(int.from_bytes(r[loc:(loc + 4)], "little"))
                     loc = loc + 4
-                realP = realP[0:-1]
                 for val in realP:
                     index = int.from_bytes(r[(val + 4):(val + 8)], "little")
                     if (index == 0):
@@ -79,31 +79,31 @@ if (rom == "ff1"):
                         if (mapN not in spawns.keys()):
                             spawns[mapN] = {}
                             spawnList.append(mapN)
-                    if (str(index).zfill(2) not in spawns[mapN].keys()):
-                        spawns[mapN][str(index).zfill(2)] = []
-                    temp = {}
-                    maxFos = int.from_bytes(r[(val + 12):(val + 16)], "little")
-                    temp["maxFos"] = [val + 12, maxFos]
-                    temp["vivos"] = []
-                    numSpawns = int.from_bytes(r[(val + 0x28):(val + 0x2C)], "little")
-                    temp["numSpawns"] = numSpawns
-                    point3 = int.from_bytes(r[(val + 0x2C):(val + 0x30)], "little")
-                    for i in range(numSpawns):
-                        point4 = int.from_bytes(r[(val + point3 + (i * 4)):(val + point3 + (i * 4) + 4)], "little")
-                        vivoNum = int.from_bytes(r[(val + point4):(val + point4 + 4)], "little")
-                        chance = int.from_bytes(r[(val + point4 + 4):(val + point4 + 8)], "little")
-                        parts = [
-                            val + point4 + 16,
-                            int.from_bytes(r[(val + point4 + 16):(val + point4 + 20)], "little"),
-                            val + point4 + 20,
-                            int.from_bytes(r[(val + point4 + 20):(val + point4 + 24)], "little"),
-                            val + point4 + 24,
-                            int.from_bytes(r[(val + point4 + 24):(val + point4 + 28)], "little"),
-                            val + point4 + 28,
-                            int.from_bytes(r[(val + point4 + 28):(val + point4 + 32)], "little")
-                        ]
-                        temp["vivos"].append([val + point4, vivoNum, val + point4 + 4, chance] + parts)
-                    spawns[mapN][str(index).zfill(2)].append(temp)                    
+                        if (str(index).zfill(2) not in spawns[mapN].keys()):
+                            spawns[mapN][str(index).zfill(2)] = []
+                        temp = {}
+                        maxFos = int.from_bytes(r[(val + 12):(val + 16)], "little")
+                        temp["maxFos"] = [val + 12, maxFos]
+                        temp["vivos"] = []
+                        numSpawns = int.from_bytes(r[(val + 0x28):(val + 0x2C)], "little")
+                        temp["numSpawns"] = numSpawns
+                        point3 = int.from_bytes(r[(val + 0x2C):(val + 0x30)], "little")
+                        for i in range(numSpawns):
+                            point4 = int.from_bytes(r[(val + point3 + (i * 4)):(val + point3 + (i * 4) + 4)], "little")
+                            vivoNum = int.from_bytes(r[(val + point4):(val + point4 + 4)], "little")
+                            chance = int.from_bytes(r[(val + point4 + 4):(val + point4 + 8)], "little")
+                            parts = [
+                                val + point4 + 16,
+                                int.from_bytes(r[(val + point4 + 16):(val + point4 + 20)], "little"),
+                                val + point4 + 20,
+                                int.from_bytes(r[(val + point4 + 20):(val + point4 + 24)], "little"),
+                                val + point4 + 24,
+                                int.from_bytes(r[(val + point4 + 24):(val + point4 + 28)], "little"),
+                                val + point4 + 28,
+                                int.from_bytes(r[(val + point4 + 28):(val + point4 + 32)], "little")
+                            ]
+                            temp["vivos"].append([val + point4, vivoNum, val + point4 + 4, chance] + parts)
+                        spawns[mapN][str(index).zfill(2)].append(temp)                    
 else:
     spawns = {}
     for root, dirs, files in os.walk("NDS_UNPACK/data/map/m/bin/"):
@@ -114,6 +114,7 @@ else:
                 f = open(os.path.join(root, file), "rb")
                 r = f.read()
                 f.close()
+                numTables = int.from_bytes(r[0x68:0x6C], "little")
                 point = int.from_bytes(r[0x6C:0x70], "little")
                 mapName = ""
                 mf = open("ffc_mapNames.txt", "rt")
@@ -126,12 +127,11 @@ else:
                             if (int(mapN) == int(n)):
                                 mapName = t.split(": ")[1]
                 mapN = mapN + " [" + mapName + "]"
-                realP = [ int.from_bytes(r[point:(point + 4)], "little") ]
-                loc = point + 4
-                while (realP[-1] > 0):
+                realP = []
+                loc = point
+                for i in range(numTables):
                     realP.append(int.from_bytes(r[loc:(loc + 4)], "little"))
                     loc = loc + 4
-                realP = realP[0:-1]
                 for val in realP:
                     index = int.from_bytes(r[(val + 2):(val + 4)], "little")
                     if (index == 0):
@@ -140,31 +140,31 @@ else:
                         if (mapN not in spawns.keys()):
                             spawns[mapN] = {}
                             spawnList.append(mapN)
-                    if (str(index).zfill(2) not in spawns[mapN].keys()):
-                        spawns[mapN][str(index).zfill(2)] = []
-                    numTables = int.from_bytes(r[(val + 12):(val + 16)], "little")
-                    point3 = int.from_bytes(r[(val + 16):(val + 20)], "little")
-                    for i in range(numTables):
-                        temp = {}
-                        point4 = int.from_bytes(r[(val + point3 + (i * 4)):(val + point3 + (i * 4) + 4)], "little")
-                        point5 = int.from_bytes(r[(val + point4 + 12):(val + point4 + 16)], "little")
-                        maxFos = int.from_bytes(r[(val + point4 + point5 + 4):(val + point4 + point5 + 8)], "little")
-                        temp["maxFos"] = [val + point4 + point5 + 4, maxFos]
-                        numWeird = int.from_bytes(r[(val + point4 + point5 + 8):(val + point4 + point5 + 12)], "little")
-                        numSpawns = int.from_bytes(r[(val + point4 + point5 + 16):(val + point4 + point5 + 20)], "little")
-                        temp["numSpawns"] = numSpawns
-                        temp["fossils"] = []
-                        startSpawns = val + point4 + point5 + 24 + (numWeird * 2)
-                        for j in range(numSpawns):
-                            thisStart = startSpawns + (j * 8)
-                            dark = r[thisStart]
-                            rare = r[thisStart + 1]
-                            kasNum = int.from_bytes(r[(thisStart + 2):(thisStart + 4)], "little")
-                            spawnChance = int.from_bytes(r[(thisStart + 4):(thisStart + 6)], "little")
-                            battleChance = int.from_bytes(r[(thisStart + 6):(thisStart + 8)], "little")
-                            temp["fossils"].append([thisStart, dark, thisStart + 1, rare, thisStart + 2, kasNum, thisStart + 4, spawnChance,
-                                thisStart + 6, battleChance])
-                        spawns[mapN][str(index).zfill(2)].append(temp)
+                        if (str(index).zfill(2) not in spawns[mapN].keys()):
+                            spawns[mapN][str(index).zfill(2)] = []
+                        numTables = int.from_bytes(r[(val + 12):(val + 16)], "little")
+                        point3 = int.from_bytes(r[(val + 16):(val + 20)], "little")
+                        for i in range(numTables):
+                            temp = {}
+                            point4 = int.from_bytes(r[(val + point3 + (i * 4)):(val + point3 + (i * 4) + 4)], "little")
+                            point5 = int.from_bytes(r[(val + point4 + 12):(val + point4 + 16)], "little")
+                            maxFos = int.from_bytes(r[(val + point4 + point5 + 4):(val + point4 + point5 + 8)], "little")
+                            temp["maxFos"] = [val + point4 + point5 + 4, maxFos]
+                            numWeird = int.from_bytes(r[(val + point4 + point5 + 8):(val + point4 + point5 + 12)], "little")
+                            numSpawns = int.from_bytes(r[(val + point4 + point5 + 16):(val + point4 + point5 + 20)], "little")
+                            temp["numSpawns"] = numSpawns
+                            temp["fossils"] = []
+                            startSpawns = val + point4 + point5 + 24 + (numWeird * 2)
+                            for j in range(numSpawns):
+                                thisStart = startSpawns + (j * 8)
+                                dark = r[thisStart]
+                                rare = r[thisStart + 1]
+                                kasNum = int.from_bytes(r[(thisStart + 2):(thisStart + 4)], "little")
+                                spawnChance = int.from_bytes(r[(thisStart + 4):(thisStart + 6)], "little")
+                                battleChance = int.from_bytes(r[(thisStart + 6):(thisStart + 8)], "little")
+                                temp["fossils"].append([thisStart, dark, thisStart + 1, rare, thisStart + 2, kasNum, thisStart + 4, spawnChance,
+                                    thisStart + 6, battleChance])
+                            spawns[mapN][str(index).zfill(2)].append(temp)
 
 maps = list(spawns.keys()).copy()
 for m in maps:
