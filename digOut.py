@@ -10,6 +10,7 @@ def ff1_DO():
                 f = open(os.path.join(root, file), "rb")
                 r = f.read()
                 f.close()
+                numTables = int.from_bytes(r[0x50:0x54], "little")
                 point = int.from_bytes(r[0x54:0x58], "little")
                 mapN = os.path.join(root, file).split("\\")[-2]
                 mf = open("ff1_mapNames.txt", "rt")
@@ -23,12 +24,11 @@ def ff1_DO():
                 f = open("ff1_vivoNames.txt", "rt")
                 vivoNames = [""] + list(f.read().split("\n")).copy()
                 f.close()
-                realP = [ int.from_bytes(r[point:(point + 4)], "little") ]
-                loc = point + 4
-                while (realP[-1] > 0):
+                realP = []
+                loc = point
+                for i in range(numTables):
                     realP.append(int.from_bytes(r[loc:(loc + 4)], "little"))
                     loc = loc + 4
-                realP = realP[0:-1]
                 check = 0
                 for val in realP:
                     index = int.from_bytes(r[(val + 4):(val + 8)], "little")
@@ -77,6 +77,7 @@ def ffc_DO():
                 f = open(os.path.join(root, file), "rb")
                 r = f.read()
                 f.close()
+                numTables = int.from_bytes(r[0x68:0x6C], "little")
                 point = int.from_bytes(r[0x6C:0x70], "little")
                 mapN = os.path.join(root, file).split("\\")[-2]
                 mapN = mapN.split("/")[-1] # it just works
@@ -88,12 +89,11 @@ def ffc_DO():
                 for l in (f.read().split("\n")):
                     mapNames[l.split(": ")[0]] = l.split(": ")[1]
                 f.close()
-                realP = [ int.from_bytes(r[point:(point + 4)], "little") ]
-                loc = point + 4
-                while (realP[-1] > 0):
+                realP = []
+                loc = point
+                for i in range(numTables):
                     realP.append(int.from_bytes(r[loc:(loc + 4)], "little"))
                     loc = loc + 4
-                realP = realP[0:-1]
                 check = 0
                 for val in realP:
                     index = int.from_bytes(r[(val + 2):(val + 4)], "little")
